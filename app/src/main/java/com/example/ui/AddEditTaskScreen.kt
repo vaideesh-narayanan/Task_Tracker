@@ -64,35 +64,41 @@ fun AddEditTaskScreen(
                     IconButton(onClick = onNavigateBack) {
                         Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
                     }
-                }
-            )
-        },
-        floatingActionButton = {
-            FloatingActionButton(
-                onClick = {
-                    if (title.isNotBlank()) {
-                        if (dueDateMillis != null && dueDateMillis!! < System.currentTimeMillis()) {
-                            val now = System.currentTimeMillis()
-                            val todayCalendar = java.util.Calendar.getInstance().apply { timeInMillis = now }
-                            val dueCalendar = java.util.Calendar.getInstance().apply { timeInMillis = dueDateMillis!! }
-                            
-                            val isPastDate = dueCalendar.get(java.util.Calendar.YEAR) < todayCalendar.get(java.util.Calendar.YEAR) ||
-                                (dueCalendar.get(java.util.Calendar.YEAR) == todayCalendar.get(java.util.Calendar.YEAR) && dueCalendar.get(java.util.Calendar.DAY_OF_YEAR) < todayCalendar.get(java.util.Calendar.DAY_OF_YEAR))
-                                
-                            if (isPastDate) {
-                                pastWarningType = "Date"
-                            } else {
-                                pastWarningType = "Time"
+                },
+                actions = {
+                    IconButton(
+                        onClick = {
+                            if (title.isNotBlank()) {
+                                if (dueDateMillis != null && dueDateMillis!! < System.currentTimeMillis()) {
+                                    val now = System.currentTimeMillis()
+                                    val todayCalendar = java.util.Calendar.getInstance().apply { timeInMillis = now }
+                                    val dueCalendar = java.util.Calendar.getInstance().apply { timeInMillis = dueDateMillis!! }
+                                    
+                                    val isPastDate = dueCalendar.get(java.util.Calendar.YEAR) < todayCalendar.get(java.util.Calendar.YEAR) ||
+                                        (dueCalendar.get(java.util.Calendar.YEAR) == todayCalendar.get(java.util.Calendar.YEAR) && dueCalendar.get(java.util.Calendar.DAY_OF_YEAR) < todayCalendar.get(java.util.Calendar.DAY_OF_YEAR))
+                                        
+                                    if (isPastDate) {
+                                        pastWarningType = "Date and Time"
+                                    } else {
+                                        pastWarningType = "Time"
+                                    }
+                                } else {
+                                    saveTask()
+                                }
                             }
-                        } else {
-                            saveTask()
-                        }
+                        },
+                        modifier = Modifier.testTag("save_task_fab")
+                    ) {
+                        Icon(Icons.Filled.Check, contentDescription = "Save Task")
                     }
                 },
-                modifier = Modifier.testTag("save_task_fab")
-            ) {
-                Icon(Icons.Filled.Check, contentDescription = "Save Task")
-            }
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = MaterialTheme.colorScheme.primary,
+                    titleContentColor = MaterialTheme.colorScheme.onPrimary,
+                    navigationIconContentColor = MaterialTheme.colorScheme.onPrimary,
+                    actionIconContentColor = MaterialTheme.colorScheme.onPrimary
+                )
+            )
         },
         modifier = modifier
     ) { innerPadding ->
@@ -247,8 +253,8 @@ fun AddEditTaskScreen(
             if (pastWarningType != null) {
                 AlertDialog(
                     onDismissRequest = { pastWarningType = null },
-                    title = { Text(if (pastWarningType == "Date") "Past Due Date" else "Past Due Time") },
-                    text = { Text("The selected due ${pastWarningType?.lowercase()} is in the past. Do you want to proceed anyway or fix the date/time?") },
+                    title = { Text(if (pastWarningType == "Date and Time") "Past Due Date and Time" else "Past Due Time") },
+                    text = { Text("The selected due ${pastWarningType?.lowercase()} is in the past. Do you want to proceed anyway or fix the ${pastWarningType?.lowercase()}?") },
                     confirmButton = {
                         TextButton(onClick = {
                             pastWarningType = null
@@ -259,7 +265,7 @@ fun AddEditTaskScreen(
                     },
                     dismissButton = {
                         TextButton(onClick = { pastWarningType = null }) {
-                            Text("Fix Date/Time")
+                            Text("Fix $pastWarningType")
                         }
                     }
                 )
