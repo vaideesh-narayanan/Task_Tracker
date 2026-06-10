@@ -1,0 +1,6 @@
+{
+  "name": "Task Tracker",
+  "description": "A complete all-in-one task, todo, and reminder application.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
