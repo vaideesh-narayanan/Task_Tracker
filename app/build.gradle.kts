@@ -11,13 +11,19 @@ android {
   compileSdk = 36
 
   defaultConfig {
-    applicationId = "com.aistudio.tasktracker.vxpqrst"
+    applicationId = "com.tasktracker.app"
     minSdk = 24
     targetSdk = 36
     versionCode = 1
     versionName = "1.0"
 
     testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+  }
+
+  bundle {
+      language {
+          enableSplit = true
+      }
   }
 
   signingConfigs {
@@ -38,8 +44,9 @@ android {
 
   buildTypes {
     release {
-      isCrunchPngs = false
-      isMinifyEnabled = false
+      isCrunchPngs = true
+      isMinifyEnabled = true
+      isShrinkResources = true
       proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
       signingConfig = signingConfigs.getByName("release")
     }

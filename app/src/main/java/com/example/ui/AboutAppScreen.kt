@@ -14,6 +14,9 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.example.R
 
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.material.icons.filled.EventAvailable
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AboutAppScreen(onNavigateBack: () -> Unit) {
@@ -39,15 +42,16 @@ fun AboutAppScreen(onNavigateBack: () -> Unit) {
             modifier = Modifier
                 .fillMaxSize()
                 .padding(innerPadding)
-                .padding(24.dp),
+                .padding(horizontal = 24.dp, vertical = 16.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
-            Image(
-                painter = painterResource(id = R.drawable.ic_launcher_foreground), 
+            Icon(
+                Icons.Filled.EventAvailable, 
                 contentDescription = "App Logo", 
-                modifier = Modifier.size(80.dp)
+                modifier = Modifier.size(80.dp),
+                tint = MaterialTheme.colorScheme.primary
             )
+            Spacer(modifier = Modifier.height(16.dp))
             Text(
                 text = "Task Tracker",
                 style = MaterialTheme.typography.headlineMedium,
@@ -59,19 +63,28 @@ fun AboutAppScreen(onNavigateBack: () -> Unit) {
                 style = MaterialTheme.typography.bodyLarge,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
-            Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(32.dp))
             Text(
-                text = "Fully offline, Privacy focused, All data stored only in Your phone, Developer or Google or any third-party don't have access to your data. This app don't ask you any permission except to send notification about your task.",
+                text = "A simple and offline-first task tracking application to help you keep track of your daily goals, pending work, and completed tasks effectively.\n\n" +
+                     "Features:\n" +
+                     "• Fully Offline: No internet required.\n" +
+                     "• Privacy Focused: All data is stored only on your phone. Developers, Google, or any third-party don't have access to your data.\n" +
+                     "• No Unnecessary Permissions: This app doesn't ask you for any permissions except to send notifications about your tasks.\n" +
+                     "• Organization: Filter tasks by All, Pending, Completed, Expired, and Archived.\n" +
+                     "• Themes & Customization: Supports light and dark modes, with a choice of modern accent colors.\n" +
+                     "• Backup & Restore: Easily backup your tasks and restore them on demand.\n" +
+                     "• Recycle Bin: Recover accidentally deleted tasks easily.",
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onBackground,
-                textAlign = androidx.compose.ui.text.style.TextAlign.Center
+                textAlign = TextAlign.Start,
+                modifier = Modifier.fillMaxWidth()
             )
-            Spacer(modifier = Modifier.height(8.dp))
+            Spacer(modifier = Modifier.height(32.dp))
             Text(
-                text = "Helpful? Share it with your friends and family! Found a bug, or want to suggest new features? Please let me know by submitting your feedback privately.",
+                text = "Helpful? Share it with your friends and family!\n\nFound a bug, or want to suggest new features? Please let me know by submitting your feedback privately.",
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onBackground,
-                textAlign = androidx.compose.ui.text.style.TextAlign.Center
+                textAlign = TextAlign.Center
             )
         }
     }
