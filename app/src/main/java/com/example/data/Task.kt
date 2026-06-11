@@ -15,5 +15,6 @@ data class Task(
     val priority: Priority = Priority.MEDIUM,
     val category: String = "",
     val createdAtMillis: Long = System.currentTimeMillis(),
-    val completedAtMillis: Long? = null
+    val completedAtMillis: Long? = null,
+    val isDeleted: Boolean = false
 )

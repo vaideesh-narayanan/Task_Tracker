@@ -10,6 +10,7 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
@@ -28,14 +29,15 @@ class TaskViewModel(private val repository: TaskRepository) : ViewModel() {
         _currentFilter,
         _currentSort
     ) { taskList, filter, sort ->
+        val activeTasks = taskList.filter { !it.isDeleted }
         val now = System.currentTimeMillis()
         val THIRTY_DAYS_IN_MILLIS = 30L * 24 * 60 * 60 * 1000L
         val filtered = when (filter) {
-            TaskFilter.ALL -> taskList.filter { !(it.isCompleted && it.completedAtMillis != null && now - it.completedAtMillis > THIRTY_DAYS_IN_MILLIS) }
-            TaskFilter.PENDING -> taskList.filter { !it.isCompleted }
-            TaskFilter.COMPLETED -> taskList.filter { it.isCompleted && (it.completedAtMillis == null || now - it.completedAtMillis <= THIRTY_DAYS_IN_MILLIS) }
-            TaskFilter.EXPIRED -> taskList.filter { !it.isCompleted && it.dueDateMillis != null && it.dueDateMillis < now }
-            TaskFilter.ARCHIVED -> taskList.filter { it.isCompleted && it.completedAtMillis != null && now - it.completedAtMillis > THIRTY_DAYS_IN_MILLIS }
+            TaskFilter.ALL -> activeTasks.filter { !(it.isCompleted && it.completedAtMillis != null && now - it.completedAtMillis > THIRTY_DAYS_IN_MILLIS) }
+            TaskFilter.PENDING -> activeTasks.filter { !it.isCompleted }
+            TaskFilter.COMPLETED -> activeTasks.filter { it.isCompleted && (it.completedAtMillis == null || now - it.completedAtMillis <= THIRTY_DAYS_IN_MILLIS) }
+            TaskFilter.EXPIRED -> activeTasks.filter { !it.isCompleted && it.dueDateMillis != null && it.dueDateMillis < now }
+            TaskFilter.ARCHIVED -> activeTasks.filter { it.isCompleted && it.completedAtMillis != null && now - it.completedAtMillis > THIRTY_DAYS_IN_MILLIS }
         }
 
         when (sort) {
@@ -44,6 +46,14 @@ class TaskViewModel(private val repository: TaskRepository) : ViewModel() {
             TaskSort.DUE_DATE_DESC -> filtered.sortedWith(compareBy({ it.dueDateMillis == null }, { -(it.dueDateMillis ?: 0L) }))
             TaskSort.CREATION_DATE_DESC -> filtered.sortedByDescending { it.createdAtMillis }
         }
+    }.stateIn(
+        scope = viewModelScope,
+        started = SharingStarted.WhileSubscribed(5_000),
+        initialValue = emptyList()
+    )
+
+    val deletedTasks: StateFlow<List<Task>> = repository.allTasks.map { tasks ->
+        tasks.filter { it.isDeleted }.sortedByDescending { it.createdAtMillis }
     }.stateIn(
         scope = viewModelScope,
         started = SharingStarted.WhileSubscribed(5_000),
@@ -79,7 +89,19 @@ class TaskViewModel(private val repository: TaskRepository) : ViewModel() {
 
     fun deleteTask(id: Int) {
         viewModelScope.launch {
-            repository.deleteTask(id)
+            repository.softDeleteTask(id)
+        }
+    }
+
+    fun restoreTasks(ids: Set<Int>) {
+        viewModelScope.launch {
+            repository.restoreTasks(ids)
+        }
+    }
+
+    fun permanentlyDeleteTasks(ids: Set<Int>) {
+        viewModelScope.launch {
+            repository.deleteTasksByIds(ids)
         }
     }
 

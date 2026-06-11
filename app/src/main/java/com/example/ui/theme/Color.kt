@@ -2,13 +2,16 @@ package com.example.ui.theme
 
 import androidx.compose.ui.graphics.Color
 
-val VibrantCyan = Color(0xFF00E5FF)
-val VibrantCyanDark = Color(0xFF00B8D4)
+val PrimaryLight = Color(0xFF6C63FF)
+val PrimaryLightContainer = Color(0xFFEBE9FE)
+val OnPrimaryLightContainer = Color(0xFF1A1551)
 
-val Cyan80 = Color(0xFF80DEEA)
-val CyanGrey80 = Color(0xFFB2EBF2)
-val Teal80 = Color(0xFF80CBC4)
+val PrimaryDark = Color(0xFF8C85FF)
+val PrimaryDarkContainer = Color(0xFF2E2A68)
+val OnPrimaryDarkContainer = Color(0xFFEBE9FE)
 
-val Cyan40 = Color(0xFF00838F)
-val CyanGrey40 = Color(0xFF0097A7)
-val Teal40 = Color(0xFF00695C)
+val BackgroundLight = Color(0xFFF9FAFB)
+val SurfaceLight = Color(0xFFFFFFFF)
+
+val BackgroundDark = Color(0xFF121212)
+val SurfaceDark = Color(0xFF1E1E1E)

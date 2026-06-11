@@ -14,36 +14,36 @@ import androidx.compose.ui.graphics.Color
 
 private val DarkColorScheme =
   darkColorScheme(
-    primary = VibrantCyan,
-    secondary = VibrantCyanDark,
-    tertiary = Cyan80,
-    background = Color.Black,
-    surface = Color.Black,
-    surfaceVariant = Color(0xFF1A1A1A),
-    onPrimary = Color.Black,
+    primary = PrimaryDark,
+    onPrimary = Color(0xFF1A1551),
+    primaryContainer = PrimaryDarkContainer,
+    onPrimaryContainer = OnPrimaryDarkContainer,
+    background = BackgroundDark,
+    onBackground = Color.White,
+    surface = SurfaceDark,
+    onSurface = Color.White,
+    surfaceVariant = Color(0xFF2D2D2D),
+    onSurfaceVariant = Color(0xFFE5E7EB)
   )
 
 private val LightColorScheme =
   lightColorScheme(
-    primary = Cyan40,
-    secondary = CyanGrey40,
-    tertiary = Teal40,
-
-    /* Other default colors to override
-    background = Color(0xFFFFFBFE),
-    surface = Color(0xFFFFFBFE),
+    primary = PrimaryLight,
     onPrimary = Color.White,
-    onSecondary = Color.White,
-    onTertiary = Color.White,
-    onBackground = Color(0xFF1C1B1F),
-    onSurface = Color(0xFF1C1B1F),
-    */
+    primaryContainer = PrimaryLightContainer,
+    onPrimaryContainer = OnPrimaryLightContainer,
+    background = BackgroundLight,
+    onBackground = Color(0xFF1F2937),
+    surface = SurfaceLight,
+    onSurface = Color(0xFF1F2937),
+    surfaceVariant = Color(0xFFF3F4F6),
+    onSurfaceVariant = Color(0xFF4B5563)
   )
 
 @Composable
 fun MyApplicationTheme(
   darkTheme: Boolean = isSystemInDarkTheme(),
-  // Dynamic color is disabled to enforce vibrant cyan theme
+  // Dynamic color is disabled to enforce modern consistent theme
   dynamicColor: Boolean = false,
   content: @Composable () -> Unit,
 ) {

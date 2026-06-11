@@ -8,6 +8,8 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Sort
+import androidx.compose.material.icons.filled.Menu
+import kotlinx.coroutines.launch
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -32,16 +34,114 @@ import java.util.*
 fun HomeScreen(
     viewModel: TaskViewModel,
     onNavigateToAddEdit: (Int?) -> Unit,
+    onNavigateToSettings: () -> Unit,
+    onNavigateToPrivacyPolicy: () -> Unit,
+    onNavigateToRecycleBin: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     val tasks by viewModel.tasks.collectAsState()
     val currentFilter by viewModel.currentFilter.collectAsState()
+    val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
+    val scope = androidx.compose.runtime.rememberCoroutineScope()
+    var showStatsDialog by remember { mutableStateOf(false) }
+    var showBackupRestoreDialog by remember { mutableStateOf(false) }
 
-    Scaffold(
-        topBar = {
-            TopAppBar(
-                title = { Text("Task Tracker") },
-                colors = TopAppBarDefaults.topAppBarColors(
+    val context = androidx.compose.ui.platform.LocalContext.current
+    val backupRestoreManager = remember { com.example.data.BackupRestoreManager(context, viewModel) }
+    
+    val exportLauncher = androidx.activity.compose.rememberLauncherForActivityResult(
+        contract = androidx.activity.result.contract.ActivityResultContracts.CreateDocument("application/json")
+    ) { uri ->
+        if (uri != null) {
+            scope.launch {
+                val success = backupRestoreManager.exportTasks(uri)
+                val msg = if (success) "Export successful" else "Export failed"
+                android.widget.Toast.makeText(context, msg, android.widget.Toast.LENGTH_SHORT).show()
+            }
+        }
+    }
+
+    val importLauncher = androidx.activity.compose.rememberLauncherForActivityResult(
+        contract = androidx.activity.result.contract.ActivityResultContracts.OpenDocument()
+    ) { uri ->
+        if (uri != null) {
+            scope.launch {
+                val success = backupRestoreManager.importTasks(uri)
+                val msg = if (success) "Import successful" else "Import failed"
+                android.widget.Toast.makeText(context, msg, android.widget.Toast.LENGTH_SHORT).show()
+            }
+        }
+    }
+
+    ModalNavigationDrawer(
+        drawerState = drawerState,
+        drawerContent = {
+            ModalDrawerSheet {
+                Spacer(Modifier.height(12.dp))
+                Text(
+                    "Task Tracker",
+                    modifier = Modifier.padding(16.dp),
+                    style = MaterialTheme.typography.titleLarge
+                )
+                HorizontalDivider()
+                NavigationDrawerItem(
+                    label = { Text("Task Statistics") },
+                    selected = false,
+                    onClick = {
+                        scope.launch { drawerState.close() }
+                        showStatsDialog = true
+                    },
+                    modifier = Modifier.padding(horizontal = 12.dp)
+                )
+                NavigationDrawerItem(
+                    label = { Text("Backup & Restore") },
+                    selected = false,
+                    onClick = {
+                        scope.launch { drawerState.close() }
+                        showBackupRestoreDialog = true
+                    },
+                    modifier = Modifier.padding(horizontal = 12.dp)
+                )
+                NavigationDrawerItem(
+                    label = { Text("Settings") },
+                    selected = false,
+                    onClick = {
+                        scope.launch { drawerState.close() }
+                        onNavigateToSettings()
+                    },
+                    modifier = Modifier.padding(horizontal = 12.dp)
+                )
+                NavigationDrawerItem(
+                    label = { Text("Recycle Bin") },
+                    selected = false,
+                    onClick = {
+                        scope.launch { drawerState.close() }
+                        onNavigateToRecycleBin()
+                    },
+                    modifier = Modifier.padding(horizontal = 12.dp)
+                )
+                NavigationDrawerItem(
+                    label = { Text("Privacy Policy") },
+                    selected = false,
+                    onClick = {
+                        scope.launch { drawerState.close() }
+                        onNavigateToPrivacyPolicy()
+                    },
+                    modifier = Modifier.padding(horizontal = 12.dp)
+                )
+            }
+        }
+    ) {
+        Scaffold(
+            topBar = {
+                TopAppBar(
+                    title = { Text("Task Tracker") },
+                    navigationIcon = {
+                        IconButton(onClick = { scope.launch { drawerState.open() } }) {
+                            Icon(Icons.Filled.Menu, contentDescription = "Menu")
+                        }
+                    },
+                    colors = TopAppBarDefaults.topAppBarColors(
                     containerColor = MaterialTheme.colorScheme.primary,
                     titleContentColor = MaterialTheme.colorScheme.onPrimary,
                     actionIconContentColor = MaterialTheme.colorScheme.onPrimary
@@ -149,6 +249,59 @@ fun HomeScreen(
                 }
             }
         }
+    }
+    } // End of ModalNavigationDrawer
+
+    if (showBackupRestoreDialog) {
+        AlertDialog(
+            onDismissRequest = { showBackupRestoreDialog = false },
+            title = { Text("Backup & Restore") },
+            text = { Text("Would you like to backup your tasks to a file, or restore tasks from a previous backup?") },
+            confirmButton = {
+                Row {
+                    TextButton(onClick = {
+                        showBackupRestoreDialog = false
+                        importLauncher.launch(arrayOf("application/json", "*/*"))
+                    }) {
+                        Text("Restore")
+                    }
+                    TextButton(onClick = {
+                        showBackupRestoreDialog = false
+                        exportLauncher.launch("tasks_backup.json")
+                    }) {
+                        Text("Backup")
+                    }
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { showBackupRestoreDialog = false }) {
+                    Text("Cancel")
+                }
+            }
+        )
+    }
+
+    if (showStatsDialog) {
+        val totalTasks = tasks.size
+        val pendingTasks = tasks.count { !it.isCompleted }
+        val completedTasks = tasks.count { it.isCompleted }
+        
+        AlertDialog(
+            onDismissRequest = { showStatsDialog = false },
+            title = { Text("Task Statistics") },
+            text = {
+                Column {
+                    Text("Total Tasks: $totalTasks")
+                    Text("Pending Tasks: $pendingTasks")
+                    Text("Completed Tasks: $completedTasks")
+                }
+            },
+            confirmButton = {
+                TextButton(onClick = { showStatsDialog = false }) {
+                    Text("Close")
+                }
+            }
+        )
     }
 }
 
