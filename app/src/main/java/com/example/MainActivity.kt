@@ -67,10 +67,14 @@ class MainActivity : ComponentActivity() {
         setContent {
             val context = androidx.compose.ui.platform.LocalContext.current
             val settingsManager = SettingsManager(context)
-            val isDarkTheme by settingsManager.isDarkThemeFlow.collectAsState(initial = false)
+            val isDarkTheme by settingsManager.isDarkThemeFlow.collectAsState(initial = null)
             val accentColor by settingsManager.accentColorFlow.collectAsState(initial = null)
             
-            MyApplicationTheme(darkTheme = isDarkTheme, accentColor = accentColor) {
+            if (isDarkTheme == null) {
+                return@setContent // Wait for initial theme to load to prevent white flash glitch
+            }
+            
+            MyApplicationTheme(darkTheme = isDarkTheme!!, accentColor = accentColor) {
                 Surface(
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
@@ -101,7 +105,8 @@ class MainActivity : ComponentActivity() {
                         }
                         composable(
                             route = "add_edit?taskId={taskId}",
-                            arguments = listOf(navArgument("taskId") { type = NavType.IntType; defaultValue = -1 })
+                            arguments = listOf(navArgument("taskId") { type = NavType.IntType; defaultValue = -1 }),
+                            deepLinks = listOf(androidx.navigation.navDeepLink { uriPattern = "tasktracker://task/{taskId}" })
                         ) { backStackEntry ->
                             val taskIdArg = backStackEntry.arguments?.getInt("taskId") ?: -1
                             val taskId = if (taskIdArg == -1) null else taskIdArg

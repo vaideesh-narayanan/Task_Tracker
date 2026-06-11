@@ -47,6 +47,9 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import java.util.Date
 
+import androidx.compose.foundation.pager.HorizontalPager
+import androidx.compose.foundation.pager.rememberPagerState
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeScreen(
@@ -69,6 +72,25 @@ fun HomeScreen(
 
     val context = androidx.compose.ui.platform.LocalContext.current
     val backupRestoreManager = remember { com.example.data.BackupRestoreManager(context, viewModel) }
+
+    val filters = listOf(TaskFilter.ALL, TaskFilter.PENDING, TaskFilter.COMPLETED, TaskFilter.EXPIRED)
+    val filterLabels = listOf("All", "Pending", "Completed", "Expired")
+    val pagerState = rememberPagerState(pageCount = { filters.size })
+
+    LaunchedEffect(pagerState.currentPage) {
+        if (currentFilter != TaskFilter.ARCHIVED) {
+            viewModel.setFilter(filters[pagerState.currentPage])
+        }
+    }
+
+    LaunchedEffect(currentFilter) {
+        if (currentFilter != TaskFilter.ARCHIVED) {
+            val idx = filters.indexOf(currentFilter)
+            if (idx != -1 && pagerState.currentPage != idx) {
+                pagerState.animateScrollToPage(idx)
+            }
+        }
+    }
 
     val exportLauncher = androidx.activity.compose.rememberLauncherForActivityResult(
         contract = androidx.activity.result.contract.ActivityResultContracts.CreateDocument("application/json")
@@ -232,60 +254,65 @@ fun HomeScreen(
                     }
                 }
 
-                if (tasks.isEmpty()) {
-                    val infiniteTransition = rememberInfiniteTransition("bounce")
-                    val bounce by infiniteTransition.animateFloat(
-                        initialValue = 0f,
-                        targetValue = 20f,
-                        animationSpec = infiniteRepeatable(
-                            animation = tween(1000, easing = FastOutSlowInEasing),
-                            repeatMode = RepeatMode.Reverse
-                        ),
-                        label = "bounce"
-                    )
-                    Box(
-                        modifier = Modifier.fillMaxSize().weight(1f),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                            Icon(
-                                Icons.AutoMirrored.Filled.ListAlt,
-                                contentDescription = null,
-                                modifier = Modifier.size(64.dp).offset(y = bounce.dp),
-                                tint = MaterialTheme.colorScheme.primary.copy(alpha = 0.6f)
-                            )
-                            Spacer(Modifier.height(24.dp))
-                            val emptyText = when (currentFilter) {
-                                TaskFilter.ALL -> "No tasks! Add your first task!"
-                                TaskFilter.PENDING -> "No pending tasks. Add one!"
-                                TaskFilter.COMPLETED -> "No completed tasks. Your completed tasks will appear here."
-                                TaskFilter.EXPIRED -> "No expired tasks. Your missed tasks will appear here."
-                                TaskFilter.ARCHIVED -> "No tasks here."
+                HorizontalPager(
+                    state = pagerState,
+                    modifier = Modifier.fillMaxSize().weight(1f)
+                ) { page ->
+                    if (tasks.isEmpty()) {
+                        val infiniteTransition = rememberInfiniteTransition("bounce")
+                        val bounce by infiniteTransition.animateFloat(
+                            initialValue = 0f,
+                            targetValue = 20f,
+                            animationSpec = infiniteRepeatable(
+                                animation = tween(1000, easing = FastOutSlowInEasing),
+                                repeatMode = RepeatMode.Reverse
+                            ),
+                            label = "bounce"
+                        )
+                        Box(
+                            modifier = Modifier.fillMaxSize(),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                                Icon(
+                                    Icons.AutoMirrored.Filled.ListAlt,
+                                    contentDescription = null,
+                                    modifier = Modifier.size(64.dp).offset(y = bounce.dp),
+                                    tint = MaterialTheme.colorScheme.primary.copy(alpha = 0.6f)
+                                )
+                                Spacer(Modifier.height(24.dp))
+                                val emptyText = when (filters[page]) {
+                                    TaskFilter.ALL -> "No tasks! Add your first task!"
+                                    TaskFilter.PENDING -> "No pending tasks. Add one!"
+                                    TaskFilter.COMPLETED -> "No completed tasks. Your completed tasks will appear here."
+                                    TaskFilter.EXPIRED -> "No expired tasks. Your missed tasks will appear here."
+                                    TaskFilter.ARCHIVED -> "No tasks here."
+                                }
+                                Text(
+                                    text = emptyText, 
+                                    style = MaterialTheme.typography.bodyLarge, 
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                    textAlign = androidx.compose.ui.text.style.TextAlign.Center,
+                                    modifier = Modifier.padding(horizontal = 32.dp)
+                                )
                             }
-                            Text(
-                                text = emptyText, 
-                                style = MaterialTheme.typography.bodyLarge, 
-                                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                                textAlign = androidx.compose.ui.text.style.TextAlign.Center,
-                                modifier = Modifier.padding(horizontal = 32.dp)
-                            )
                         }
-                    }
-                } else {
-                    LazyColumn(
-                        modifier = Modifier.fillMaxSize().weight(1f),
-                        contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
-                        verticalArrangement = Arrangement.spacedBy(12.dp)
-                    ) {
-                        items(tasks, key = { it.id }) { task ->
-                            TaskItem(
-                                task = task,
-                                onCheckedChange = { viewModel.toggleTaskCompletion(task) },
-                                onClick = { onNavigateToAddEdit(task.id) },
-                                onDeleteClick = { viewModel.deleteTask(task.id) }
-                            )
+                    } else {
+                        LazyColumn(
+                            modifier = Modifier.fillMaxSize(),
+                            contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
+                            verticalArrangement = Arrangement.spacedBy(12.dp)
+                        ) {
+                            items(tasks, key = { it.id }) { task ->
+                                TaskItem(
+                                    task = task,
+                                    onCheckedChange = { viewModel.toggleTaskCompletion(task) },
+                                    onClick = { onNavigateToAddEdit(task.id) },
+                                    onDeleteClick = { viewModel.deleteTask(task.id) }
+                                )
+                            }
+                            item { Spacer(Modifier.height(80.dp)) }
                         }
-                        item { Spacer(Modifier.height(80.dp)) }
                     }
                 }
             }
