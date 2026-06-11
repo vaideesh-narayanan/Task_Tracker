@@ -1,13 +1,17 @@
 package com.example.ui
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.ColorLens
 import androidx.compose.material.icons.filled.DarkMode
 import androidx.compose.material.icons.filled.Notifications
@@ -17,6 +21,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.example.data.SettingsManager
@@ -27,7 +32,7 @@ import kotlinx.coroutines.launch
 fun SettingsScreen(settingsManager: SettingsManager, onNavigateBack: () -> Unit) {
     val isDarkTheme by settingsManager.isDarkThemeFlow.collectAsState(initial = false)
     val notificationsEnabled by settingsManager.notificationsEnabledFlow.collectAsState(initial = true)
-    var animationSpeed by remember { mutableStateOf(1f) } // 0f = slow, 1f = medium, 2f = fast
+    val accentColor by settingsManager.accentColorFlow.collectAsState(initial = null)
     
     val coroutineScope = rememberCoroutineScope()
 
@@ -83,13 +88,40 @@ fun SettingsScreen(settingsManager: SettingsManager, onNavigateBack: () -> Unit)
                     }
                 }
                 HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
-                Row(
-                    modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp),
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.SpaceBetween
+                Column(
+                    modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp)
                 ) {
                     Text("Accent Color", style = MaterialTheme.typography.bodyLarge)
-                    Box(modifier = Modifier.size(24.dp).clip(CircleShape).background(MaterialTheme.colorScheme.primary))
+                    Spacer(Modifier.height(16.dp))
+                    LazyRow(
+                        horizontalArrangement = Arrangement.spacedBy(16.dp),
+                        contentPadding = PaddingValues(horizontal = 4.dp)
+                    ) {
+                        val colors = listOf<Long>(
+                            0xFF00BCD4, 0xFFF44336, 0xFFE91E63, 0xFF9C27B0,
+                            0xFF673AB7, 0xFF3F51B5, 0xFF2196F3, 0xFF4CAF50,
+                            0xFFFF9800, 0xFFFF5722
+                        )
+                        items(colors) { colorLongVal ->
+                           val isSelected = accentColor == colorLongVal
+                           Box(
+                               modifier = Modifier
+                                   .size(36.dp)
+                                   .clip(CircleShape)
+                                   .background(Color(colorLongVal))
+                                   .clickable {
+                                       coroutineScope.launch {
+                                           settingsManager.setAccentColor(colorLongVal)
+                                       }
+                                   },
+                               contentAlignment = Alignment.Center
+                           ) {
+                               if (isSelected) {
+                                   Icon(Icons.Filled.Check, contentDescription = "Selected", tint = Color.White, modifier = Modifier.size(20.dp))
+                               }
+                           }
+                        }
+                    }
                 }
             }
 
@@ -112,25 +144,6 @@ fun SettingsScreen(settingsManager: SettingsManager, onNavigateBack: () -> Unit)
                             }
                         }
                     )
-                }
-            }
-
-            // Advanced Card
-            SettingsGroup(title = "Advanced", icon = Icons.Filled.Speed) {
-                Column(modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp)) {
-                    Text("Animation Speed", style = MaterialTheme.typography.bodyLarge)
-                    Spacer(Modifier.height(8.dp))
-                    Slider(
-                        value = animationSpeed,
-                        onValueChange = { animationSpeed = it },
-                        valueRange = 0f..2f,
-                        steps = 1
-                    )
-                    Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-                        Text("Slow", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
-                        Text("Normal", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
-                        Text("Fast", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
-                    }
                 }
             }
         }

@@ -262,7 +262,13 @@ fun HomeScreen(
                                 TaskFilter.EXPIRED -> "No expired tasks, Your missed task will be displayed here."
                                 TaskFilter.ARCHIVED -> "No tasks here."
                             }
-                            Text(emptyText, style = MaterialTheme.typography.bodyLarge, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                            Text(
+                                text = emptyText, 
+                                style = MaterialTheme.typography.bodyLarge, 
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                textAlign = androidx.compose.ui.text.style.TextAlign.Center,
+                                modifier = Modifier.padding(horizontal = 32.dp)
+                            )
                         }
                     }
                 } else {

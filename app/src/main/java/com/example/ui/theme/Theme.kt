@@ -43,11 +43,12 @@ private val LightColorScheme =
 @Composable
 fun MyApplicationTheme(
   darkTheme: Boolean = isSystemInDarkTheme(),
+  accentColor: Long? = null,
   // Dynamic color is disabled to enforce modern consistent theme
   dynamicColor: Boolean = false,
   content: @Composable () -> Unit,
 ) {
-  val colorScheme =
+  val baseColorScheme =
     when {
       dynamicColor && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S -> {
         val context = LocalContext.current
@@ -57,6 +58,13 @@ fun MyApplicationTheme(
       darkTheme -> DarkColorScheme
       else -> LightColorScheme
     }
+
+  val colorScheme = if (accentColor != null) {
+      baseColorScheme.copy(
+          primary = Color(accentColor),
+          primaryContainer = Color(accentColor).copy(alpha = 0.2f)
+      )
+  } else baseColorScheme
 
   MaterialTheme(colorScheme = colorScheme, typography = Typography, content = content)
 }

@@ -50,8 +50,9 @@ class MainActivity : ComponentActivity() {
             val context = androidx.compose.ui.platform.LocalContext.current
             val settingsManager = SettingsManager(context)
             val isDarkTheme by settingsManager.isDarkThemeFlow.collectAsState(initial = false)
+            val accentColor by settingsManager.accentColorFlow.collectAsState(initial = null)
             
-            MyApplicationTheme(darkTheme = isDarkTheme) {
+            MyApplicationTheme(darkTheme = isDarkTheme, accentColor = accentColor) {
                 Surface(
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background

@@ -44,7 +44,7 @@ fun AboutAppScreen(onNavigateBack: () -> Unit) {
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
             Image(
-                painter = painterResource(id = R.mipmap.ic_launcher_round), 
+                painter = painterResource(id = R.drawable.ic_launcher_foreground), 
                 contentDescription = "App Logo", 
                 modifier = Modifier.size(80.dp)
             )
