@@ -52,6 +52,16 @@ class TaskViewModel(private val repository: TaskRepository) : ViewModel() {
         initialValue = emptyList()
     )
 
+    val archivedTasks: StateFlow<List<Task>> = repository.allTasks.map { tasks ->
+        val now = System.currentTimeMillis()
+        val THIRTY_DAYS_IN_MILLIS = 30L * 24 * 60 * 60 * 1000L
+        tasks.filter { !it.isDeleted && it.isCompleted && it.completedAtMillis != null && now - it.completedAtMillis > THIRTY_DAYS_IN_MILLIS }.sortedByDescending { it.completedAtMillis }
+    }.stateIn(
+        scope = viewModelScope,
+        started = SharingStarted.WhileSubscribed(5_000),
+        initialValue = emptyList()
+    )
+
     val deletedTasks: StateFlow<List<Task>> = repository.allTasks.map { tasks ->
         tasks.filter { it.isDeleted }.sortedByDescending { it.createdAtMillis }
     }.stateIn(

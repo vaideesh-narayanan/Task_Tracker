@@ -15,15 +15,15 @@ import androidx.compose.ui.graphics.Color
 private val DarkColorScheme =
   darkColorScheme(
     primary = PrimaryDark,
-    onPrimary = Color(0xFF1A1551),
+    onPrimary = Color.White,
     primaryContainer = PrimaryDarkContainer,
     onPrimaryContainer = OnPrimaryDarkContainer,
     background = BackgroundDark,
-    onBackground = Color.White,
+    onBackground = TextPrimaryDark,
     surface = SurfaceDark,
-    onSurface = Color.White,
-    surfaceVariant = Color(0xFF2D2D2D),
-    onSurfaceVariant = Color(0xFFE5E7EB)
+    onSurface = TextPrimaryDark,
+    surfaceVariant = CardDark,
+    onSurfaceVariant = TextSecondaryDark
   )
 
 private val LightColorScheme =
@@ -36,7 +36,7 @@ private val LightColorScheme =
     onBackground = Color(0xFF1F2937),
     surface = SurfaceLight,
     onSurface = Color(0xFF1F2937),
-    surfaceVariant = Color(0xFFF3F4F6),
+    surfaceVariant = CardLight,
     onSurfaceVariant = Color(0xFF4B5563)
   )
 

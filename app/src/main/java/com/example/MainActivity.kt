@@ -34,10 +34,11 @@ import com.example.data.AppDatabase
 import com.example.data.SettingsManager
 import com.example.data.TaskRepository
 import com.example.ui.AddEditTaskScreen
+import com.example.ui.ArchiveScreen
 import com.example.ui.HomeScreen
 import com.example.ui.RecycleBinScreen
 import com.example.ui.SettingsScreen
-import com.example.ui.PrivacyPolicyScreen
+import com.example.ui.AboutAppScreen
 import com.example.ui.TaskViewModel
 import com.example.ui.theme.MyApplicationTheme
 
@@ -73,7 +74,8 @@ class MainActivity : ComponentActivity() {
                                     }
                                 },
                                 onNavigateToSettings = { navController.navigate("settings") },
-                                onNavigateToPrivacyPolicy = { navController.navigate("privacy") },
+                                onNavigateToAbout = { navController.navigate("about") },
+                                onNavigateToArchive = { navController.navigate("archive") },
                                 onNavigateToRecycleBin = { navController.navigate("recycle_bin") }
                             )
                         }
@@ -95,9 +97,18 @@ class MainActivity : ComponentActivity() {
                                 onNavigateBack = { navController.popBackStack() }
                             )
                         }
-                        composable("privacy") {
-                            PrivacyPolicyScreen(
+                        composable("about") {
+                            AboutAppScreen(
                                 onNavigateBack = { navController.popBackStack() }
+                            )
+                        }
+                        composable("archive") {
+                            ArchiveScreen(
+                                viewModel = viewModel,
+                                onNavigateBack = { navController.popBackStack() },
+                                onNavigateToAddEdit = { taskId ->
+                                    navController.navigate("add_edit?taskId=$taskId")
+                                }
                             )
                         }
                         composable("recycle_bin") {

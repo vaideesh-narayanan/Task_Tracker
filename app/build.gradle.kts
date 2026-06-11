@@ -8,12 +8,12 @@ plugins {
 
 android {
   namespace = "com.example"
-  compileSdk { version = release(36) { minorApiLevel = 1 } }
+  compileSdk = 36
 
   defaultConfig {
     applicationId = "com.aistudio.tasktracker.vxpqrst"
     minSdk = 24
-    targetSdk = 34
+    targetSdk = 36
     versionCode = 1
     versionName = "1.0"
 
