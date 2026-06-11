@@ -256,10 +256,10 @@ fun HomeScreen(
                             )
                             Spacer(Modifier.height(24.dp))
                             val emptyText = when (currentFilter) {
-                                TaskFilter.ALL -> "No task! Add your first task!"
-                                TaskFilter.PENDING -> "No pending task, Add one!"
-                                TaskFilter.COMPLETED -> "No Completed task, Your completed task will display here."
-                                TaskFilter.EXPIRED -> "No expired tasks, Your missed task will be displayed here."
+                                TaskFilter.ALL -> "No tasks! Add your first task!"
+                                TaskFilter.PENDING -> "No pending tasks. Add one!"
+                                TaskFilter.COMPLETED -> "No completed tasks. Your completed tasks will appear here."
+                                TaskFilter.EXPIRED -> "No expired tasks. Your missed tasks will appear here."
                                 TaskFilter.ARCHIVED -> "No tasks here."
                             }
                             Text(

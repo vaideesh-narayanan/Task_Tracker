@@ -1,5 +1,10 @@
 package com.example.ui
 
+import android.os.Build
+import android.Manifest
+import android.content.pm.PackageManager
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -35,6 +40,43 @@ fun SettingsScreen(settingsManager: SettingsManager, onNavigateBack: () -> Unit)
     val accentColor by settingsManager.accentColorFlow.collectAsState(initial = null)
     
     val coroutineScope = rememberCoroutineScope()
+    val context = androidx.compose.ui.platform.LocalContext.current
+    
+    var hasPermission by remember { mutableStateOf(true) }
+    val lifecycleOwner = androidx.lifecycle.compose.LocalLifecycleOwner.current
+
+    DisposableEffect(lifecycleOwner) {
+        val observer = androidx.lifecycle.LifecycleEventObserver { _, event ->
+            if (event == androidx.lifecycle.Lifecycle.Event.ON_RESUME) {
+                val granted = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                    androidx.core.content.ContextCompat.checkSelfPermission(
+                        context, Manifest.permission.POST_NOTIFICATIONS
+                    ) == PackageManager.PERMISSION_GRANTED
+                } else {
+                    true
+                }
+                hasPermission = granted
+                if (!granted && notificationsEnabled) {
+                    coroutineScope.launch {
+                        settingsManager.setNotificationsEnabled(false)
+                    }
+                }
+            }
+        }
+        lifecycleOwner.lifecycle.addObserver(observer)
+        onDispose {
+            lifecycleOwner.lifecycle.removeObserver(observer)
+        }
+    }
+
+    val permissionLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.RequestPermission()
+    ) { isGranted ->
+        hasPermission = isGranted
+        coroutineScope.launch {
+            settingsManager.setNotificationsEnabled(isGranted)
+        }
+    }
 
     Scaffold(
         topBar = {
@@ -137,10 +179,18 @@ fun SettingsScreen(settingsManager: SettingsManager, onNavigateBack: () -> Unit)
                         style = MaterialTheme.typography.bodyLarge
                     )
                     Switch(
-                        checked = notificationsEnabled,
-                        onCheckedChange = { 
+                        checked = notificationsEnabled && hasPermission,
+                        onCheckedChange = { isChecked -> 
+                            if (isChecked && Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                                if (androidx.core.content.ContextCompat.checkSelfPermission(
+                                    context, Manifest.permission.POST_NOTIFICATIONS
+                                ) != PackageManager.PERMISSION_GRANTED) {
+                                    permissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
+                                    return@Switch
+                                }
+                            }
                             coroutineScope.launch {
-                                settingsManager.setNotificationsEnabled(it)
+                                settingsManager.setNotificationsEnabled(isChecked)
                             }
                         }
                     )

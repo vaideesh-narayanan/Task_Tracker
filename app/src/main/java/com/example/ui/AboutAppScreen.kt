@@ -68,7 +68,7 @@ fun AboutAppScreen(onNavigateBack: () -> Unit) {
                 text = "A simple and offline-first task tracking application to help you keep track of your daily goals, pending work, and completed tasks effectively.\n\n" +
                      "Features:\n" +
                      "• Fully Offline: No internet required.\n" +
-                     "• Privacy Focused: All data is stored only on your phone. Developers, Google, or any third-party don't have access to your data.\n" +
+                     "• Privacy Focused: All data is stored only on your phone. Developers, Google, or any third parties do not have access to your data.\n" +
                      "• No Unnecessary Permissions: This app doesn't ask you for any permissions except to send notifications about your tasks.\n" +
                      "• Organization: Filter tasks by All, Pending, Completed, Expired, and Archived.\n" +
                      "• Themes & Customization: Supports light and dark modes, with a choice of modern accent colors.\n" +
