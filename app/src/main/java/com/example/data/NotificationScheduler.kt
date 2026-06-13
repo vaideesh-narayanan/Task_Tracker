@@ -23,11 +23,9 @@ class NotificationScheduler(private val context: Context) {
         val triggerTime = task.dueDateMillis
         if (triggerTime != null && triggerTime > System.currentTimeMillis() && !task.isCompleted && !task.isDeleted) {
             try {
-                alarmManager.setExactAndAllowWhileIdle(
-                    AlarmManager.RTC_WAKEUP,
-                    triggerTime,
-                    pendingIntent
-                )
+                // Use setAlarmClock to ensure it rings on aggressive battery management OEMs like Xiaomi / MIUI
+                val alarmClockInfo = AlarmManager.AlarmClockInfo(triggerTime, pendingIntent)
+                alarmManager.setAlarmClock(alarmClockInfo, pendingIntent)
             } catch (e: SecurityException) {
                 // Fallback if exact alarm permission is missing
                 alarmManager.set(

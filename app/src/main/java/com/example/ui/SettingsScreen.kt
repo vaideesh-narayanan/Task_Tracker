@@ -195,6 +195,41 @@ fun SettingsScreen(settingsManager: SettingsManager, onNavigateBack: () -> Unit)
                         }
                     )
                 }
+                
+                HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
+                
+                Text(
+                    "Missing reminders?",
+                    style = MaterialTheme.typography.bodyMedium,
+                    fontWeight = FontWeight.Bold,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+                Text(
+                    "Some devices restrict background tasks. Tap below and set to 'No restrictions' or disable battery optimization for this app.",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    modifier = Modifier.padding(top = 4.dp, bottom = 8.dp)
+                )
+                Button(
+                    onClick = {
+                        try {
+                            val intent = android.content.Intent(android.provider.Settings.ACTION_IGNORE_BATTERY_OPTIMIZATION_SETTINGS)
+                            context.startActivity(intent)
+                        } catch (e: Exception) {
+                            try {
+                                val intent = android.content.Intent(android.provider.Settings.ACTION_APPLICATION_DETAILS_SETTINGS)
+                                intent.data = android.net.Uri.parse("package:${context.packageName}")
+                                context.startActivity(intent)
+                            } catch (e2: Exception) {
+                                e2.printStackTrace()
+                            }
+                        }
+                    },
+                    modifier = Modifier.fillMaxWidth(),
+                    colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primaryContainer, contentColor = MaterialTheme.colorScheme.onPrimaryContainer)
+                ) {
+                    Text("Battery Settings")
+                }
             }
         }
     }

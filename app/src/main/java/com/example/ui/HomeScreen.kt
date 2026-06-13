@@ -849,15 +849,6 @@ fun TaskItem(
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis
                     )
-                    if (task.description.isNotBlank()) {
-                        Text(
-                            text = task.description,
-                            style = MaterialTheme.typography.bodyMedium,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant,
-                            maxLines = 2,
-                            overflow = TextOverflow.Ellipsis
-                        )
-                    }
                     Spacer(modifier = Modifier.height(8.dp))
                     Row(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalAlignment = Alignment.CenterVertically) {
                         if (task.category.isNotBlank()) {

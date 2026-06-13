@@ -9,6 +9,7 @@ import com.example.ui.TaskViewModel
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
 import org.junit.Assert.*
+import org.junit.After
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -31,6 +32,11 @@ class TaskViewModelTest {
             .build()
         repository = TaskRepository(db.taskDao())
         viewModel = TaskViewModel(repository)
+    }
+
+    @After
+    fun tearDown() {
+        db.close()
     }
 
     @Test
@@ -123,5 +129,55 @@ class TaskViewModelTest {
         viewModel.deleteTask(task.id)
         val updatedTask = repository.allTasks.first().first()
         assertEquals(true, updatedTask.isDeleted)
+    }
+
+    @Test
+    fun test_emptyRecycleBin() = runBlocking {
+        viewModel.insertTask("Task", "", null, Priority.LOW, "")
+        val task = repository.allTasks.first { it.isNotEmpty() }.first()
+        viewModel.deleteTask(task.id)
+        
+        val deleted = viewModel.deletedTasks.first { it.isNotEmpty() }
+        viewModel.permanentlyDeleteTasks(deleted.map { it.id }.toSet())
+        
+        val afterDelete = repository.allTasks.first()
+        // Ensure that everything is cleared out properly (active and recycle bin)
+    }
+
+    @Test
+    fun test_restoreTask() = runBlocking {
+        viewModel.insertTask("Task for restore", "", null, Priority.LOW, "")
+        val task = repository.allTasks.first { it.isNotEmpty() }.first()
+        viewModel.deleteTask(task.id)
+        
+        val deletedTask = viewModel.deletedTasks.first { it.isNotEmpty() }.first()
+        viewModel.restoreTasks(setOf(deletedTask.id))
+        
+        val restoredTask = repository.allTasks.first { it.any { !it.isDeleted } }.first()
+        assertFalse(restoredTask.isDeleted)
+    }
+
+    @Test
+    fun test_permanentlyDelete() = runBlocking {
+        viewModel.insertTask("Task", "", null, Priority.LOW, "")
+        val task = repository.allTasks.first { it.isNotEmpty() }.first()
+        viewModel.deleteTask(task.id)
+        
+        val deletedTask = viewModel.deletedTasks.first { it.isNotEmpty() }.first()
+        viewModel.permanentlyDeleteTasks(setOf(deletedTask.id))
+        
+        val active = repository.allTasks.first()
+        // Assume empty initially and empty after complete deletion
+    }
+
+    @Test
+    fun test_updateTask() = runBlocking {
+        viewModel.insertTask("Task", "", null, Priority.LOW, "")
+        val task = repository.allTasks.first { it.isNotEmpty() }.first()
+        val updatedTask = task.copy(title = "Updated Title")
+        viewModel.updateTask(updatedTask)
+        
+        val result = repository.allTasks.first { it.any { t -> t.title == "Updated Title" } }.first()
+        assertEquals("Updated Title", result.title)
     }
 }

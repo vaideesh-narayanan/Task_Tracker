@@ -17,7 +17,6 @@ import androidx.compose.ui.unit.dp
 import com.example.R
 
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.material.icons.filled.EventAvailable
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -56,11 +55,10 @@ fun AboutAppScreen(onNavigateBack: () -> Unit) {
                     modifier = Modifier.padding(24.dp).fillMaxWidth(),
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-                    Icon(
-                        Icons.Filled.EventAvailable, 
+                    Image(
+                        painter = painterResource(id = R.mipmap.ic_launcher),
                         contentDescription = "App Logo", 
-                        modifier = Modifier.size(80.dp),
-                        tint = MaterialTheme.colorScheme.primary
+                        modifier = Modifier.size(80.dp)
                     )
                     Spacer(modifier = Modifier.height(16.dp))
                     Text(

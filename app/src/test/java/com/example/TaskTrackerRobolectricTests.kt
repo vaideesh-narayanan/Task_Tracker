@@ -6,6 +6,7 @@ import com.example.data.*
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
 import org.junit.Assert.*
+import org.junit.After
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -28,6 +29,11 @@ class TaskTrackerRobolectricTests {
             .build()
         taskDao = db.taskDao()
         settingsManager = SettingsManager(context)
+    }
+
+    @After
+    fun tearDown() {
+        db.close()
     }
 
     @Test
