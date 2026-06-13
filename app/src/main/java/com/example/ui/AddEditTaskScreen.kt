@@ -44,7 +44,8 @@ fun AddEditTaskScreen(
     taskId: Int?,
     viewModel: TaskViewModel,
     onNavigateBack: () -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    autoReschedule: Boolean = false
 ) {
     var title by remember { mutableStateOf("") }
     var description by remember { mutableStateOf("") }
@@ -124,7 +125,7 @@ fun AddEditTaskScreen(
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
                     containerColor = MaterialTheme.colorScheme.background,
-                    titleContentColor = MaterialTheme.colorScheme.onBackground,
+                    titleContentColor = MaterialTheme.colorScheme.primary,
                     navigationIconContentColor = MaterialTheme.colorScheme.onBackground,
                     actionIconContentColor = MaterialTheme.colorScheme.primary
                 )
@@ -157,7 +158,10 @@ fun AddEditTaskScreen(
                         colors = OutlinedTextFieldDefaults.colors(
                             focusedContainerColor = Color.Transparent,
                             unfocusedContainerColor = Color.Transparent,
-                            focusedBorderColor = MaterialTheme.colorScheme.primary
+                            focusedBorderColor = MaterialTheme.colorScheme.primary,
+                            unfocusedBorderColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.5f),
+                            focusedLabelColor = MaterialTheme.colorScheme.primary,
+                            unfocusedLabelColor = MaterialTheme.colorScheme.primary
                         )
                     )
                     OutlinedTextField(
@@ -168,7 +172,11 @@ fun AddEditTaskScreen(
                         maxLines = 5,
                         colors = OutlinedTextFieldDefaults.colors(
                             focusedContainerColor = Color.Transparent,
-                            unfocusedContainerColor = Color.Transparent
+                            unfocusedContainerColor = Color.Transparent,
+                            focusedBorderColor = MaterialTheme.colorScheme.primary,
+                            unfocusedBorderColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.5f),
+                            focusedLabelColor = MaterialTheme.colorScheme.primary,
+                            unfocusedLabelColor = MaterialTheme.colorScheme.primary
                         )
                     )
                 }
@@ -176,7 +184,7 @@ fun AddEditTaskScreen(
 
             // Category Chips
             Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                Text("Category", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.SemiBold)
+                Text("Category", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.SemiBold, color = MaterialTheme.colorScheme.primary)
                 Row(
                     modifier = Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()),
                     horizontalArrangement = Arrangement.spacedBy(8.dp)
@@ -188,7 +196,12 @@ fun AddEditTaskScreen(
                             onClick = { category = if (category == cat) "" else cat },
                             label = { Text(cat) },
                             shape = RoundedCornerShape(16.dp),
-                            leadingIcon = if (category == cat) { { Icon(Icons.Filled.Check, null) } } else null
+                            leadingIcon = if (category == cat) { { Icon(Icons.Filled.Check, null) } } else null,
+                            colors = FilterChipDefaults.filterChipColors(
+                                selectedContainerColor = MaterialTheme.colorScheme.primaryContainer,
+                                selectedLabelColor = MaterialTheme.colorScheme.primary,
+                                selectedLeadingIconColor = MaterialTheme.colorScheme.primary
+                            )
                         )
                     }
                 }
@@ -198,13 +211,21 @@ fun AddEditTaskScreen(
                     placeholder = { Text("Or add custom category...") },
                     modifier = Modifier.fillMaxWidth().padding(top = 8.dp),
                     singleLine = true,
-                    leadingIcon = { Icon(Icons.AutoMirrored.Filled.Label, null) }
+                    leadingIcon = { Icon(Icons.AutoMirrored.Filled.Label, null, tint = MaterialTheme.colorScheme.primary) },
+                    colors = OutlinedTextFieldDefaults.colors(
+                        focusedBorderColor = MaterialTheme.colorScheme.primary,
+                        unfocusedBorderColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.5f),
+                        focusedLeadingIconColor = MaterialTheme.colorScheme.primary,
+                        unfocusedLeadingIconColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.5f),
+                        focusedPlaceholderColor = MaterialTheme.colorScheme.primary,
+                        unfocusedPlaceholderColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.7f)
+                    )
                 )
             }
 
             // Priority
             Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                Text("Priority", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.SemiBold)
+                Text("Priority", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.SemiBold, color = MaterialTheme.colorScheme.primary)
                 Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
                     listOf(Priority.LOW to PriorityLow, Priority.MEDIUM to PriorityMedium, Priority.HIGH to PriorityHigh).forEach { (p, color) ->
                         val isSelected = priority == p
@@ -230,11 +251,11 @@ fun AddEditTaskScreen(
             }
 
             // Due Date
-            var showDatePicker by remember { mutableStateOf(false) }
+            var showDatePicker by remember { mutableStateOf(autoReschedule) }
             var showTimePicker by remember { mutableStateOf(false) }
 
             Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                Text("Due Date & Time", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.SemiBold)
+                Text("Due Date & Time", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.SemiBold, color = MaterialTheme.colorScheme.primary)
                 Card(
                     modifier = Modifier.fillMaxWidth().clickable { showDatePicker = true },
                     shape = RoundedCornerShape(12.dp),
@@ -255,6 +276,32 @@ fun AddEditTaskScreen(
                 if (dueDateMillis != null) {
                     TextButton(onClick = { dueDateMillis = null }, modifier = Modifier.align(Alignment.End)) {
                         Text("Clear Date", color = MaterialTheme.colorScheme.error)
+                    }
+                }
+            }
+            
+            if (taskId != null) {
+                existingTask?.let { task ->
+                    if (!task.isCompleted) {
+                        Row(modifier = Modifier.fillMaxWidth().padding(top = 16.dp), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                            Button(
+                                onClick = {
+                                    viewModel.updateTask(task.copy(isCompleted = true, completedAtMillis = System.currentTimeMillis()))
+                                    onNavigateBack()
+                                },
+                                modifier = Modifier.weight(1f),
+                                shape = RoundedCornerShape(12.dp)
+                            ) {
+                                Text("Mark as Completed", modifier = Modifier.padding(vertical = 8.dp), textAlign = androidx.compose.ui.text.style.TextAlign.Center)
+                            }
+                            OutlinedButton(
+                                onClick = { showDatePicker = true },
+                                modifier = Modifier.weight(1f),
+                                shape = RoundedCornerShape(12.dp)
+                            ) {
+                                Text("Reschedule", modifier = Modifier.padding(vertical = 8.dp), textAlign = androidx.compose.ui.text.style.TextAlign.Center)
+                            }
+                        }
                     }
                 }
             }

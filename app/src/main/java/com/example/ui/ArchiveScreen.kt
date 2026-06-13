@@ -41,7 +41,7 @@ fun ArchiveScreen(
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
                     containerColor = MaterialTheme.colorScheme.background,
-                    titleContentColor = MaterialTheme.colorScheme.onBackground,
+                    titleContentColor = MaterialTheme.colorScheme.primary,
                     navigationIconContentColor = MaterialTheme.colorScheme.onBackground
                 )
             )
@@ -86,7 +86,8 @@ fun ArchiveScreen(
                                         delay(300)
                                         viewModel.deleteTask(task.id) 
                                     }
-                                }
+                                },
+                                isArchived = true
                             )
                         }
                     }

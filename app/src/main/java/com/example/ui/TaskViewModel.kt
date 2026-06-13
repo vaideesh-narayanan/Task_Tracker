@@ -24,6 +24,23 @@ class TaskViewModel(private val repository: TaskRepository) : ViewModel() {
     private val _currentSort = MutableStateFlow(TaskSort.DEFAULT)
     val currentSort: StateFlow<TaskSort> = _currentSort.asStateFlow()
 
+    val allActiveTasks: StateFlow<List<Task>> = combine(
+        repository.allTasks,
+        _currentSort
+    ) { taskList, sort ->
+        val activeTasks = taskList.filter { !it.isDeleted }
+        when (sort) {
+            TaskSort.DEFAULT -> activeTasks.sortedWith(compareBy({ it.isCompleted }, { it.dueDateMillis ?: Long.MAX_VALUE }, { -it.createdAtMillis }))
+            TaskSort.DUE_DATE_ASC -> activeTasks.sortedWith(compareBy({ it.dueDateMillis == null }, { it.dueDateMillis }))
+            TaskSort.DUE_DATE_DESC -> activeTasks.sortedWith(compareBy({ it.dueDateMillis == null }, { -(it.dueDateMillis ?: 0L) }))
+            TaskSort.CREATION_DATE_DESC -> activeTasks.sortedByDescending { it.createdAtMillis }
+        }
+    }.stateIn(
+        scope = viewModelScope,
+        started = SharingStarted.WhileSubscribed(5_000),
+        initialValue = emptyList()
+    )
+
     val tasks: StateFlow<List<Task>> = combine(
         repository.allTasks,
         _currentFilter,

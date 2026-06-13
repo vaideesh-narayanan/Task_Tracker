@@ -104,14 +104,22 @@ class MainActivity : ComponentActivity() {
                             )
                         }
                         composable(
-                            route = "add_edit?taskId={taskId}",
-                            arguments = listOf(navArgument("taskId") { type = NavType.IntType; defaultValue = -1 }),
-                            deepLinks = listOf(androidx.navigation.navDeepLink { uriPattern = "tasktracker://task/{taskId}" })
+                            route = "add_edit?taskId={taskId}&reschedule={reschedule}",
+                            arguments = listOf(
+                                navArgument("taskId") { type = NavType.IntType; defaultValue = -1 },
+                                navArgument("reschedule") { type = NavType.BoolType; defaultValue = false }
+                            ),
+                            deepLinks = listOf(
+                                androidx.navigation.navDeepLink { uriPattern = "tasktracker://task/{taskId}?reschedule={reschedule}" },
+                                androidx.navigation.navDeepLink { uriPattern = "tasktracker://task/{taskId}" }
+                            )
                         ) { backStackEntry ->
                             val taskIdArg = backStackEntry.arguments?.getInt("taskId") ?: -1
+                            val reschedule = backStackEntry.arguments?.getBoolean("reschedule") ?: false
                             val taskId = if (taskIdArg == -1) null else taskIdArg
                             AddEditTaskScreen(
                                 taskId = taskId,
+                                autoReschedule = reschedule,
                                 viewModel = viewModel,
                                 onNavigateBack = { navController.popBackStack() }
                             )

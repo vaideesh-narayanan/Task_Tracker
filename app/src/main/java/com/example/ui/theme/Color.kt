@@ -10,7 +10,7 @@ val PrimaryDark = Color(0xFF00BCD4)
 val PrimaryDarkContainer = Color(0xFF006064)
 val OnPrimaryDarkContainer = Color(0xFFE0F7FA)
 
-val BackgroundLight = Color(0xFFFFF9F0)
+val BackgroundLight = Color(0xFFF3E4D4)
 val SurfaceLight = Color(0xFFFFFFFF)
 val CardLight = Color(0xFFFFFFFF)
 

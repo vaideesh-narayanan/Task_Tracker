@@ -22,15 +22,20 @@ class NotificationScheduler(private val context: Context) {
 
         val triggerTime = task.dueDateMillis
         if (triggerTime != null && triggerTime > System.currentTimeMillis() && !task.isCompleted && !task.isDeleted) {
-            // Using set to avoid requiring SCHEDULE_EXACT_ALARM on API 31+.
-            // This is slightly less precise but much safer without special permission prompts.
-            // But we can use setExactAndAllowWhileIdle if we add USE_EXACT_ALARM.
-            // Let's use set to save complexity, it should be fine.
-            alarmManager.set(
-                AlarmManager.RTC_WAKEUP,
-                triggerTime,
-                pendingIntent
-            )
+            try {
+                alarmManager.setExactAndAllowWhileIdle(
+                    AlarmManager.RTC_WAKEUP,
+                    triggerTime,
+                    pendingIntent
+                )
+            } catch (e: SecurityException) {
+                // Fallback if exact alarm permission is missing
+                alarmManager.set(
+                    AlarmManager.RTC_WAKEUP,
+                    triggerTime,
+                    pendingIntent
+                )
+            }
         } else {
             // Cancel alarm if task is completed or deleted or time is past
             alarmManager.cancel(pendingIntent)

@@ -54,6 +54,11 @@ fun RecycleBinScreen(
                         Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
                     }
                 },
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = MaterialTheme.colorScheme.background,
+                    titleContentColor = MaterialTheme.colorScheme.primary,
+                    navigationIconContentColor = MaterialTheme.colorScheme.onBackground
+                ),
                 actions = {
                     if (deletedTasks.isNotEmpty()) {
                         TextButton(
@@ -68,13 +73,7 @@ fun RecycleBinScreen(
                             Text(if (selectedTaskIds.size == deletedTasks.size) "Deselect All" else "Select All")
                         }
                     }
-                },
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.background,
-                    titleContentColor = MaterialTheme.colorScheme.onBackground,
-                    navigationIconContentColor = MaterialTheme.colorScheme.onBackground,
-                    actionIconContentColor = MaterialTheme.colorScheme.onBackground
-                )
+                }
             )
         },
         bottomBar = {
@@ -106,9 +105,8 @@ fun RecycleBinScreen(
                                 Spacer(Modifier.width(4.dp))
                                 Text("Restore")
                             }
-                            Button(
-                                onClick = { showConfirmDeleteDialog = selectedTaskIds },
-                                colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.error)
+                            TextButton(
+                                onClick = { showConfirmDeleteDialog = selectedTaskIds }
                             ) {
                                 Icon(Icons.Filled.DeleteForever, contentDescription = null, modifier = Modifier.size(18.dp))
                                 Spacer(Modifier.width(4.dp))
@@ -273,7 +271,7 @@ fun RecycleBinTaskItem(
                     Icon(Icons.Filled.Restore, contentDescription = "Restore", tint = MaterialTheme.colorScheme.primary)
                 }
                 IconButton(onClick = onDelete) {
-                    Icon(Icons.Filled.DeleteForever, contentDescription = "Delete", tint = MaterialTheme.colorScheme.error)
+                    Icon(Icons.Filled.DeleteForever, contentDescription = "Delete", tint = MaterialTheme.colorScheme.primary)
                 }
             }
         }

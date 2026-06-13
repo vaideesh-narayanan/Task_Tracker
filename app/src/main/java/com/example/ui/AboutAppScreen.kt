@@ -31,7 +31,7 @@ fun AboutAppScreen(onNavigateBack: () -> Unit) {
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
                     containerColor = MaterialTheme.colorScheme.background,
-                    titleContentColor = MaterialTheme.colorScheme.onBackground,
+                    titleContentColor = MaterialTheme.colorScheme.primary,
                     navigationIconContentColor = MaterialTheme.colorScheme.onBackground
                 )
             )
@@ -65,15 +65,12 @@ fun AboutAppScreen(onNavigateBack: () -> Unit) {
             )
             Spacer(modifier = Modifier.height(32.dp))
             Text(
-                text = "A simple and offline-first task tracking application to help you keep track of your daily goals, pending work, and completed tasks effectively.\n\n" +
+                text = "A simple, offline-first task tracker for your daily goals.\n\n" +
                      "Features:\n" +
-                     "• Fully Offline: No internet required.\n" +
-                     "• Privacy Focused: All data is stored only on your phone. Developers, Google, or any third parties do not have access to your data.\n" +
-                     "• No Unnecessary Permissions: This app doesn't ask you for any permissions except to send notifications about your tasks.\n" +
-                     "• Organization: Filter tasks by All, Pending, Completed, Expired, and Archived.\n" +
-                     "• Themes & Customization: Supports light and dark modes, with a choice of modern accent colors.\n" +
-                     "• Backup & Restore: Easily backup your tasks and restore them on demand.\n" +
-                     "• Recycle Bin: Recover accidentally deleted tasks easily.",
+                     "• Fully Offline & Privacy Focused: Data stays on your phone.\n" +
+                     "• Organization: Filter tasks or restore them from Recycle Bin.\n" +
+                     "• Customization: Themes and Accent colors.\n" +
+                     "• Data Management: Easy Backup and Restore.",
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onBackground,
                 textAlign = TextAlign.Start,

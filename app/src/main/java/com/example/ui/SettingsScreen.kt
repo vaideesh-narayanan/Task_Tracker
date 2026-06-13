@@ -89,7 +89,7 @@ fun SettingsScreen(settingsManager: SettingsManager, onNavigateBack: () -> Unit)
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
                     containerColor = MaterialTheme.colorScheme.background,
-                    titleContentColor = MaterialTheme.colorScheme.onBackground,
+                    titleContentColor = MaterialTheme.colorScheme.primary,
                     navigationIconContentColor = MaterialTheme.colorScheme.onBackground
                 )
             )

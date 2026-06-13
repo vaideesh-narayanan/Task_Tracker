@@ -1,6 +1,8 @@
 package com.example.ui.theme
 
+import android.app.Activity
 import android.os.Build
+import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.darkColorScheme
@@ -8,8 +10,10 @@ import androidx.compose.material3.dynamicDarkColorScheme
 import androidx.compose.material3.dynamicLightColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.SideEffect
 import androidx.compose.ui.platform.LocalContext
-
+import androidx.compose.ui.platform.LocalView
+import androidx.core.view.WindowCompat
 import androidx.compose.ui.graphics.Color
 
 private val DarkColorScheme =
@@ -65,6 +69,27 @@ fun MyApplicationTheme(
           primaryContainer = Color(accentColor).copy(alpha = 0.2f)
       )
   } else baseColorScheme
+
+  val view = LocalView.current
+  if (!view.isInEditMode) {
+    SideEffect {
+      val window = (view.context as Activity).window
+      WindowCompat.getInsetsController(window, view).isAppearanceLightStatusBars = !darkTheme
+      WindowCompat.getInsetsController(window, view).isAppearanceLightNavigationBars = !darkTheme
+      
+      try {
+          val activity = view.context as androidx.activity.ComponentActivity
+          val style = if (darkTheme) {
+              androidx.activity.SystemBarStyle.dark(android.graphics.Color.TRANSPARENT)
+          } else {
+              androidx.activity.SystemBarStyle.light(android.graphics.Color.TRANSPARENT, android.graphics.Color.TRANSPARENT)
+          }
+          activity.enableEdgeToEdge(statusBarStyle = style, navigationBarStyle = style)
+      } catch (e: Exception) {
+          // Fallback if context is not a ComponentActivity
+      }
+    }
+  }
 
   MaterialTheme(colorScheme = colorScheme, typography = Typography, content = content)
 }
