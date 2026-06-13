@@ -51,7 +51,7 @@ class TaskViewModel(private val repository: TaskRepository) : ViewModel() {
         val THIRTY_DAYS_IN_MILLIS = 30L * 24 * 60 * 60 * 1000L
         val filtered = when (filter) {
             TaskFilter.ALL -> activeTasks.filter { !(it.isCompleted && it.completedAtMillis != null && now - it.completedAtMillis > THIRTY_DAYS_IN_MILLIS) }
-            TaskFilter.PENDING -> activeTasks.filter { !it.isCompleted }
+            TaskFilter.PENDING -> activeTasks.filter { !it.isCompleted && (it.dueDateMillis == null || it.dueDateMillis >= now) }
             TaskFilter.COMPLETED -> activeTasks.filter { it.isCompleted && (it.completedAtMillis == null || now - it.completedAtMillis <= THIRTY_DAYS_IN_MILLIS) }
             TaskFilter.EXPIRED -> activeTasks.filter { !it.isCompleted && it.dueDateMillis != null && it.dueDateMillis < now }
             TaskFilter.ARCHIVED -> activeTasks.filter { it.isCompleted && it.completedAtMillis != null && now - it.completedAtMillis > THIRTY_DAYS_IN_MILLIS }
@@ -91,6 +91,12 @@ class TaskViewModel(private val repository: TaskRepository) : ViewModel() {
     fun setSort(sort: TaskSort) { _currentSort.value = sort }
 
     fun getTaskStream(id: Int) = repository.getTaskStream(id)
+
+    fun insertTaskDirectly(task: Task) {
+        viewModelScope.launch {
+            repository.insertTask(task)
+        }
+    }
 
     fun insertTask(title: String, description: String, dueDateMillis: Long?, priority: com.example.data.Priority, category: String) {
         viewModelScope.launch {

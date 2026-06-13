@@ -15,7 +15,8 @@ class BackupRestoreManager(private val context: Context, private val viewModel: 
     suspend fun exportTasks(uri: Uri): Boolean {
         return withContext(Dispatchers.IO) {
             try {
-                val tasks = viewModel.tasks.first()
+                // Export all active and archived tasks regardless of current filter
+                val tasks = viewModel.allActiveTasks.first() + viewModel.archivedTasks.first()
                 val json = gson.toJson(tasks)
                 context.contentResolver.openOutputStream(uri)?.use { outputStream ->
                     outputStream.write(json.toByteArray())
@@ -37,13 +38,9 @@ class BackupRestoreManager(private val context: Context, private val viewModel: 
                     val tasks: List<Task> = gson.fromJson(json, type)
                     
                     tasks.forEach { task ->
-                        viewModel.insertTask(
-                            title = task.title,
-                            description = task.description,
-                            dueDateMillis = task.dueDateMillis,
-                            priority = task.priority,
-                            category = task.category
-                        )
+                        // Re-insert exact task state (if importing back, we want to maintain completion state, etc)
+                        // If ID exists it might conflict, inserting as 0 generates a new ID but maintains state
+                        viewModel.insertTaskDirectly(task.copy(id = 0)) 
                     }
                 }
                 true
