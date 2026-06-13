@@ -220,8 +220,9 @@ fun RecycleBinTaskItem(
             .alpha(0.7f), // Faded style to indicate deleted
         shape = RoundedCornerShape(16.dp),
         colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surfaceVariant
+            containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)
         ),
+        border = androidx.compose.foundation.BorderStroke(1.dp, MaterialTheme.colorScheme.primary.copy(alpha = 0.25f)),
         elevation = CardDefaults.cardElevation(0.dp)
     ) {
         Row(

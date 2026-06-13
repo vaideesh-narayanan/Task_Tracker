@@ -2,6 +2,8 @@ package com.example.ui
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Info
@@ -42,47 +44,58 @@ fun AboutAppScreen(onNavigateBack: () -> Unit) {
             modifier = Modifier
                 .fillMaxSize()
                 .padding(innerPadding)
-                .padding(horizontal = 24.dp, vertical = 16.dp),
-            horizontalAlignment = Alignment.CenterHorizontally,
+                .padding(16.dp),
         ) {
-            Icon(
-                Icons.Filled.EventAvailable, 
-                contentDescription = "App Logo", 
-                modifier = Modifier.size(80.dp),
-                tint = MaterialTheme.colorScheme.primary
-            )
-            Spacer(modifier = Modifier.height(16.dp))
-            Text(
-                text = "Task Tracker",
-                style = MaterialTheme.typography.headlineMedium,
-                fontWeight = FontWeight.Bold,
-                color = MaterialTheme.colorScheme.primary
-            )
-            Text(
-                text = "Version 1.0.0",
-                style = MaterialTheme.typography.bodyLarge,
-                color = MaterialTheme.colorScheme.onSurfaceVariant
-            )
-            Spacer(modifier = Modifier.height(32.dp))
-            Text(
-                text = "A simple, offline-first task tracker for your daily goals.\n\n" +
-                     "Features:\n" +
-                     "• Fully Offline & Privacy Focused: Data stays on your phone.\n" +
-                     "• Organization: Filter tasks or restore them from Recycle Bin.\n" +
-                     "• Customization: Themes and Accent colors.\n" +
-                     "• Data Management: Easy Backup and Restore.",
-                style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.onBackground,
-                textAlign = TextAlign.Start,
-                modifier = Modifier.fillMaxWidth()
-            )
-            Spacer(modifier = Modifier.height(32.dp))
-            Text(
-                text = "Helpful? Share it with your friends and family!\n\nFound a bug, or want to suggest new features? Please let me know by submitting your feedback privately.",
-                style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.onBackground,
-                textAlign = TextAlign.Center
-            )
+            Card(
+                shape = androidx.compose.foundation.shape.RoundedCornerShape(24.dp),
+                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)),
+                border = androidx.compose.foundation.BorderStroke(1.dp, MaterialTheme.colorScheme.primary.copy(alpha = 0.25f)),
+                modifier = Modifier.fillMaxWidth().verticalScroll(androidx.compose.foundation.rememberScrollState())
+            ) {
+                Column(
+                    modifier = Modifier.padding(24.dp).fillMaxWidth(),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    Icon(
+                        Icons.Filled.EventAvailable, 
+                        contentDescription = "App Logo", 
+                        modifier = Modifier.size(80.dp),
+                        tint = MaterialTheme.colorScheme.primary
+                    )
+                    Spacer(modifier = Modifier.height(16.dp))
+                    Text(
+                        text = "Task Tracker",
+                        style = MaterialTheme.typography.headlineMedium,
+                        fontWeight = FontWeight.Bold,
+                        color = MaterialTheme.colorScheme.primary
+                    )
+                    Text(
+                        text = "Version 1.0.0",
+                        style = MaterialTheme.typography.bodyLarge,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                    Spacer(modifier = Modifier.height(32.dp))
+                    Text(
+                        text = "A simple, offline-first task tracker for your daily goals.\n\n" +
+                             "Features:\n" +
+                             "• Fully Offline & Privacy Focused: Data stays on your phone.\n" +
+                             "• Organization: Filter tasks or restore them from Recycle Bin.\n" +
+                             "• Customization: Themes and Accent colors.\n" +
+                             "• Data Management: Easy Backup and Restore.",
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        textAlign = TextAlign.Start,
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                    Spacer(modifier = Modifier.height(32.dp))
+                    Text(
+                        text = "Helpful? Share it with your friends and family!\n\nFound a bug, or want to suggest new features? Please let me know by submitting your feedback privately.",
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        textAlign = TextAlign.Center
+                    )
+                }
+            }
         }
     }
 }
