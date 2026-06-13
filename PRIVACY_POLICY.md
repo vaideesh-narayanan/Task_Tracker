@@ -30,4 +30,4 @@ We may update our Privacy Policy from time to time. We will notify you of any ch
 
 ## 6. Contact Us
 
-If you have any questions or suggestions about our Privacy Policy, please feel free to contact us at vaideesh004@gmail.com.
+If you have any questions or suggestions about our Privacy Policy, please feel free to contact us at .
