@@ -14,6 +14,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.graphics.luminance
 import com.example.R
 
 import androidx.compose.ui.text.style.TextAlign
@@ -55,11 +56,21 @@ fun AboutAppScreen(onNavigateBack: () -> Unit) {
                     modifier = Modifier.padding(24.dp).fillMaxWidth(),
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-                    Image(
-                        painter = painterResource(id = R.mipmap.ic_launcher),
-                        contentDescription = "App Logo", 
-                        modifier = Modifier.size(80.dp)
-                    )
+                    val isDarkTheme = MaterialTheme.colorScheme.background.luminance() < 0.5f
+                    val iconBgColor = if (isDarkTheme) androidx.compose.ui.graphics.Color(0xFF1A1A1A) else androidx.compose.ui.graphics.Color(0xFFFFFFFF)
+                    
+                    Surface(
+                        shape = androidx.compose.foundation.shape.CircleShape,
+                        color = iconBgColor,
+                        shadowElevation = 4.dp,
+                        modifier = Modifier.size(96.dp)
+                    ) {
+                        Image(
+                            painter = painterResource(id = R.drawable.ic_launcher_foreground),
+                            contentDescription = "App Logo", 
+                            modifier = Modifier.fillMaxSize()
+                        )
+                    }
                     Spacer(modifier = Modifier.height(16.dp))
                     Text(
                         text = "Task Tracker",

@@ -28,6 +28,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
+import androidx.core.net.toUri
 import androidx.compose.ui.unit.dp
 import com.example.data.SettingsManager
 import kotlinx.coroutines.launch
@@ -218,7 +219,7 @@ fun SettingsScreen(settingsManager: SettingsManager, onNavigateBack: () -> Unit)
                         } catch (e: Exception) {
                             try {
                                 val intent = android.content.Intent(android.provider.Settings.ACTION_APPLICATION_DETAILS_SETTINGS)
-                                intent.data = android.net.Uri.parse("package:${context.packageName}")
+                                intent.data = "package:${context.packageName}".toUri()
                                 context.startActivity(intent)
                             } catch (e2: Exception) {
                                 e2.printStackTrace()

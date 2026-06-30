@@ -10,6 +10,7 @@ import android.Manifest
 import com.example.MainActivity
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.flow.first
+import androidx.core.net.toUri
 
 class TaskAlarmReceiver : BroadcastReceiver() {
     override fun onReceive(context: Context, intent: Intent) {
@@ -43,7 +44,7 @@ class TaskAlarmReceiver : BroadcastReceiver() {
                     context, Manifest.permission.POST_NOTIFICATIONS
                 ) == PackageManager.PERMISSION_GRANTED || android.os.Build.VERSION.SDK_INT < android.os.Build.VERSION_CODES.TIRAMISU) {
                 
-                val openAppIntent = Intent(Intent.ACTION_VIEW, android.net.Uri.parse("tasktracker://task/$taskId")).apply {
+                val openAppIntent = Intent(Intent.ACTION_VIEW, "tasktracker://task/$taskId".toUri()).apply {
                     flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
                 }
                 val pendingContentIntent = android.app.PendingIntent.getActivity(
